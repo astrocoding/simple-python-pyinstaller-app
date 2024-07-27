@@ -1,7 +1,7 @@
 node {
     stage('Build') {
         // Menjalankan perintah untuk mengkompilasi file Python
-        sh 'python3 -m py_compile sources/add2vals.py sources/calc.py'
+        sh 'python -m py_compile sources/add2vals.py sources/calc.py'
         
         // Menyimpan hasil kompilasi
         stash name: 'compiled-results', includes: 'sources/*.py*'
