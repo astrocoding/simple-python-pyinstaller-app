@@ -56,11 +56,6 @@ pipeline {
                 sleep(time: 1, unit: 'MINUTES')
                 echo 'Eksekusi pipeline selesai.'
             }
-            post {
-                success {
-                    archiveArtifacts 'dist/add2vals'
-                }
-            }
         }
     }
 }
