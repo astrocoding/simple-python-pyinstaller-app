@@ -48,10 +48,8 @@ pipeline {
             }
             steps {
                 sh 'pyinstaller --onefile sources/add2vals.py'
-                script {
-                    echo 'Menunggu 1 menit sebelum mengakhiri...'
-                    sleep(time: 1, unit: 'MINUTES')
-                }
+                echo 'Menunggu 1 menit sebelum mengakhiri...'
+                sleep(time: 1, unit: 'MINUTES')
                 echo 'Eksekusi pipeline selesai.'
             }
             post {
