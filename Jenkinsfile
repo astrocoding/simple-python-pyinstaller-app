@@ -1,25 +1,63 @@
-node {
-    stage('Build') {
-        docker.image('python:2-alpine').inside {
-            try {
-                echo "Starting build stage..."
+pipeline {
+    agent none
+    stages {
+        stage('Build') {
+            agent {
+                docker {
+                    image 'python:2-alpine'
+                }
+            }
+            steps {
                 sh 'python -m py_compile sources/add2vals.py sources/calc.py'
-                echo "Build stage completed successfully."
-            } catch (Exception e) {
-                echo "Build stage failed with error: ${e}"
-                throw e
             }
         }
-    }
-
-    stage('Test') {
-        docker.image('qnib/pytest').inside {
-            try {
-                echo "Starting test stage..."
+        stage('Test') {
+            agent {
+                docker {
+                    image 'qnib/pytest'
+                }
+            }
+            steps {
                 sh 'py.test --verbose --junit-xml test-reports/results.xml sources/test_calc.py'
-            } finally {
-                junit 'test-reports/results.xml'
-                echo "Test stage completed."
+            }
+            post {
+                always {
+                    junit 'test-reports/results.xml'
+                }
+            }
+        }
+        stage('Manual Approval') {
+            steps {
+                script {
+                    def userInput = input(
+                        id: 'Proceed', message: 'Lanjutkan ke tahap Deploy?', parameters: [
+                            choice(name: 'Lanjutkan?', choices: 'Proceed\nAbort', description: 'Pilih opsi:')
+                        ]
+                    )
+                    if (userInput == 'Abort') {
+                        error('Pipeline dihentikan oleh pengguna.')
+                    }
+                }
+            }
+        }
+        stage('Deploy') {
+            agent {
+                docker {
+                    image 'cdrx/pyinstaller-linux:python2'
+                }
+            }
+            steps {
+                sh 'pyinstaller --onefile sources/add2vals.py'
+                script {
+                    echo 'Menunggu 1 menit sebelum mengakhiri...'
+                    sleep(time: 1, unit: 'MINUTES')
+                }
+                echo 'Eksekusi pipeline selesai.'
+            }
+            post {
+                success {
+                    archiveArtifacts 'dist/add2vals'
+                }
             }
         }
     }
