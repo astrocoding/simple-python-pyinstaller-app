@@ -41,6 +41,11 @@ pipeline {
             }
         }
         stage('Deploy') {
+            agent {
+                docker {
+                    image 'cdrx/pyinstaller-linux:python2'
+                }
+            }
             steps {
                 script {
                     sh 'echo "Memulai Deploy Stage"'
