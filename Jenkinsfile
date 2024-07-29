@@ -1,5 +1,5 @@
 pipeline {
-    agent none
+    agent any
     stages {
         stage('Build') {
             agent {
@@ -26,14 +26,35 @@ pipeline {
                 }
             }
         }
-        stage('Deliver') {
+        stage('Manual Approval') {
+            steps {
+                script {
+                    def userInput = input(
+                        id: 'Proceed', message: 'Lanjutkan ke tahap Deploy?', parameters: [
+                            choice(name: 'Lanjutkan?', choices: 'Proceed\nAbort', description: 'Pilih opsi:')
+                        ]
+                    )
+                    if (userInput == 'Abort') {
+                        error('Pipeline dihentikan oleh pengguna.')
+                    }
+                }
+            }
+        }
+        stage('Deploy') {
             agent {
                 docker {
                     image 'cdrx/pyinstaller-linux:python2'
                 }
             }
             steps {
-                sh 'pyinstaller --onefile sources/add2vals.py'
+                script {
+                    sh 'docker run -it --rm cdrx/pyinstaller-linux:python2 /bin/sh'
+                    sh 'echo "Memulai Deploy Stage"'
+                    sh 'sudo pyinstaller --onefile sources/add2vals.py'
+                }
+                echo 'Menunggu 1 menit sebelum mengakhiri...'
+                sleep(time: 1, unit: 'MINUTES')
+                echo 'Eksekusi pipeline selesai.'
             }
             post {
                 success {
