@@ -43,18 +43,22 @@ pipeline {
         stage('Deploy') {
             agent {
                 docker {
-                    image 'cdrx/pyinstaller-linux:python2'
+                    image 'python:3.8'
                 }
             }
             steps {
-                sh 'echo "Memulai Deploy Stage"'
                 script {
-                    // Pastikan pyinstaller terinstal dan jalankan perintah deploy
-                    sh 'pyinstaller --onefile sources/add2vals.py'
+                    sh 'pip install nuitka'
+                    sh 'nuitka --onefile sources/add2vals.py'
                 }
                 echo 'Menunggu 1 menit sebelum mengakhiri...'
                 sleep(time: 1, unit: 'MINUTES')
                 echo 'Eksekusi pipeline selesai.'
+            }
+            post {
+                success {
+                    archiveArtifacts 'sources/add2vals.bin'
+                }
             }
         }
     }
