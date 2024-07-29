@@ -47,8 +47,12 @@ pipeline {
                 }
             }
             steps {
-                sh 'which pyinstaller'
-                sh 'pyinstaller --onefile sources/add2vals.py'
+                script {
+                    sh 'echo "Memulai Deploy Stage"'
+                    sh 'ls -l' // Daftar file untuk memastikan sources/add2vals.py ada
+                    sh 'which pyinstaller' // Pastikan pyinstaller terinstal
+                    sh 'pyinstaller --onefile sources/add2vals.py'
+                }
                 echo 'Menunggu 1 menit sebelum mengakhiri...'
                 sleep(time: 1, unit: 'MINUTES')
                 echo 'Eksekusi pipeline selesai.'
