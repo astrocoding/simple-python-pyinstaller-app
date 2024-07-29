@@ -44,12 +44,13 @@ pipeline {
             agent {
                 docker {
                     image 'python:3.8'
+                    args '-u root'
                 }
             }
             steps {
                 script {
-                    sh 'pip install nuitka'
-                    sh 'nuitka --onefile sources/add2vals.py'
+                    sh 'pip install pyinstaller'
+                    sh 'pyinstaller --onefile sources/add2vals.py'
                 }
                 echo 'Menunggu 1 menit sebelum mengakhiri...'
                 sleep(time: 1, unit: 'MINUTES')
@@ -57,7 +58,7 @@ pipeline {
             }
             post {
                 success {
-                    archiveArtifacts 'sources/add2vals.bin'
+                    archiveArtifacts 'dist/add2vals'
                 }
             }
         }
