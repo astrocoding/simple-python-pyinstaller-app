@@ -44,15 +44,11 @@ pipeline {
             agent {
                 docker {
                     image 'cdrx/pyinstaller-linux:python2'
-                    args '-p 3000:3000' // Menyesuaikan dengan port jika diperlukan
                 }
             }
             steps {
+                sh 'echo "Memulai Deploy Stage"'
                 script {
-                    // Menjalankan kontainer untuk debugging jika perlu
-                    sh 'docker run -it --rm cdrx/pyinstaller-linux:python2 /bin/sh'
-                    sh 'echo "Memulai Deploy Stage"'
-                    
                     // Pastikan pyinstaller terinstal dan jalankan perintah deploy
                     sh 'pyinstaller --onefile sources/add2vals.py'
                 }
