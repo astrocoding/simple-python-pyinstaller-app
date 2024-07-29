@@ -47,6 +47,7 @@ pipeline {
                 }
             }
             steps {
+                sh 'which pyinstaller'
                 sh 'pyinstaller --onefile sources/add2vals.py'
                 echo 'Menunggu 1 menit sebelum mengakhiri...'
                 sleep(time: 1, unit: 'MINUTES')
